@@ -1,32 +1,29 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: backup-mongodb
+  name: backup-redis
 spec:
-  schedule: "0 */1 * * *"
+  schedule: "0 1 * * *"
   concurrencyPolicy: Forbid
   suspend: false
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
-  
   jobTemplate:
     spec:
       template:
         spec:
           restartPolicy: OnFailure
-          
           containers:
-          - name: backup-mongodb
+          - name: backup-redis
             image: ptuladhar/k8s-backup-mongodb:latest
             env:
-            - name: MONGODB_URI
+            - name: RedisURI
               valueFrom:
                 secretKeyRef:
-                  name: mongodb-uri
-                  key: MONGODB_URI
+                  name: redis-uri
+                  key: RedisURI
             
-            - name: MONGODB_OPLOG
-              value: true
+            
 
             - name: BUCKET_URI
               valueFrom:
@@ -51,4 +48,3 @@ spec:
                 secretKeyRef:
                   name: aws
                   key: AWS_DEFAULT_REGION
-
